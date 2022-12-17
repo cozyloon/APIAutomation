@@ -69,6 +69,90 @@ You will need to include the appropriate JDBC driver library for your database i
 
 Note that using JDBC to map a database table to a Java class is a low-level approach that requires a lot of boilerplate code and is prone to error. A framework such as JPA can significantly simplify this process and provide additional features such as caching and lazy loading.
 
+===========
+2nd example chatgpt
+===========
 
+import java.sql.*;
+
+public class DatabaseMapper {
+
+    // JDBC driver name and database URL
+    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost/mydatabase";
+
+    // Database credentials
+    static final String USER = "username";
+    static final String PASS = "password";
+
+    public static void main(String[] args) {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            // Open a connection
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+
+            // Execute a query
+            stmt = conn.createStatement();
+            String sql = "SELECT * FROM mytable";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            // Extract data from result set
+            while (rs.next()) {
+                // Retrieve each column by name
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                int age = rs.getInt("age");
+
+                // Create a new POJO and set the values
+                MyPojo pojo = new MyPojo();
+                pojo.setId(id);
+                pojo.setName(name);
+                pojo.setAge(age);
+
+                // Do something with the POJO...
+            }
+
+            // Clean up
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            // Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            // Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            // Finally block used to close resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException se2) {
+                // Nothing we can do
+            }
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+}
+
+class MyPojo {
+    private int id;
+    private String name;
+    private int age;
+
+    // Getters and setters for the POJO properties
+   
+}
 
 
