@@ -1,0 +1,74 @@
+To map a database table to a Java class without using a framework such as the Java Persistence API (JPA), you can use JDBC (Java Database Connectivity) to connect to the database and retrieve the data.
+
+Here is an example of how you can map a database table to a Java class using JDBC:
+
+import java.sql.*;
+
+public class Employee {
+   private int id;
+   private String name;
+   private double salary;
+
+   // constructors, getters, and setters
+}
+
+public class EmployeeMapper {
+   public static Employee mapRow(ResultSet rs) throws SQLException {
+      Employee employee = new Employee();
+      employee.setId(rs.getInt("id"));
+      employee.setName(rs.getString("name"));
+      employee.setSalary(rs.getDouble("salary"));
+      return employee;
+   }
+}
+
+public class Main {
+   public static void main(String[] args) {
+      // Load the JDBC driver
+      try {
+         Class.forName("com.mysql.jdbc.Driver");
+      } catch (ClassNotFoundException e) {
+         e.printStackTrace();
+         return;
+      }
+
+      // Establish a connection to the database
+      Connection conn = null;
+      try {
+         conn = DriverManager.getConnection("jdbc:mysql://localhost/employeedb", "username", "password");
+
+         // Create a statement
+         Statement stmt = conn.createStatement();
+
+         // Execute a SELECT query and process the result set
+         ResultSet rs = stmt.executeQuery("SELECT * FROM employees");
+         while (rs.next()) {
+            Employee employee = EmployeeMapper.mapRow(rs);
+            // do something with the employee object
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            if (conn != null) {
+               conn.close();
+            }
+         } catch (SQLException e) {
+            e.printStackTrace();
+         }
+      }
+   }
+}
+
+
+In this example, the Employee class represents a row in the employees table, and the EmployeeMapper class contains a method that maps a ResultSet object (which represents the result of a SELECT query) to an Employee object.
+
+The Main class establishes a connection to the database, creates a Statement object, and executes a SELECT query to retrieve all rows from the employees table. It then iterates over the result set, calling the mapRow method to map each row to an Employee object, and does something with the object.
+
+You will need to include the appropriate JDBC driver library for your database in your classpath.
+
+Note that using JDBC to map a database table to a Java class is a low-level approach that requires a lot of boilerplate code and is prone to error. A framework such as JPA can significantly simplify this process and provide additional features such as caching and lazy loading.
+
+
+
+
